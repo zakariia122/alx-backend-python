@@ -3,7 +3,7 @@
 Utils module
 """
 
-from typing import Mapping, Any, Sequence, Union
+from typing import Mapping, Any, Sequence
 import requests
 
 
@@ -52,14 +52,14 @@ def memoize(method):
         method: The method to cache.
 
     Returns:
-        property: The memoized method.
+        Cached function result.
     """
-    attr_name = "_{}".format(method.__name__)
+    attr_name = f"_memoized_{method.__name__}"
 
-    @property
     def wrapper(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, method(self))
         return getattr(self, attr_name)
 
     return wrapper
+
