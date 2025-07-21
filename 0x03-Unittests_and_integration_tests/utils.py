@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Utils module
-"""
-
 from typing import Mapping, Any, Sequence
 import requests
 
@@ -23,10 +18,13 @@ def access_nested_map(nested_map: Mapping, path: Sequence) -> Any:
     """
     current = nested_map
     for key in path:
-        if isinstance(current, Mapping):
+        try:
             current = current[key]
-        else:
-            raise TypeError(f"{type(current).__name__} object is not subscriptable")
+        except KeyError:
+            raise
+        except TypeError:
+            # إذا current ماشي Mapping، نرفع KeyError باش يتوافق مع التستات
+            raise KeyError(key)
     return current
 
 
@@ -54,12 +52,12 @@ def memoize(method):
     Returns:
         Cached function result.
     """
-    attr_name = f"_memoized_{method.__name__}"
+    attr_name = f"_{method.__name__}"
 
+    @property
     def wrapper(self):
         if not hasattr(self, attr_name):
             setattr(self, attr_name, method(self))
         return getattr(self, attr_name)
 
     return wrapper
-
